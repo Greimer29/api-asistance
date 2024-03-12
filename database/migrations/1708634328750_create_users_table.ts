@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('nombre')
       table.string('apellido')
       table.string('cargo')
+      table.string('fotoURL')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
