@@ -9,8 +9,6 @@ export default class extends BaseSchema {
       table.string('nombre')
       table.string('apellido')
       table.string('cargo')
-      table.string('hora_entrada')
-      table.string('hora_salida')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
