@@ -1,9 +1,7 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 //import User from '#models/user'
 import User from '#models/user'
-import { cuid } from '@adonisjs/core/helpers'
 import { HttpContext } from '@adonisjs/core/http'
-import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
 
 export default class UsersController {
@@ -15,21 +13,40 @@ export default class UsersController {
     const name = request.input('name')
     const lastName = request.input('lastName')
     const charge = request.input('charges')
+
+    const user = await db
+      .insertQuery()
+      .table('users')
+      .insert({
+        nombre: name,
+        apellido: lastName,
+        cargo: charge,
+        fotoURL: 'notyet',
+      })
+      .returning('id')
+
+    return user[0]
+  }
+
+  async upload({ request, params, response }: HttpContext) {
+    const user = await User.findOrFail(params.id)
     const userImage = request.file('foto', {
       size: '7mb',
       extnames: ['jpg', 'png', 'jpeg'],
     })
+    if (!userImage) {
+      console.log('No paso nada')
+      return response.json({ err: 'Se serio mrk no mandaste nada' })
+    } else {
+      await userImage.move('uploads', {
+        name: userImage.clientName,
+        overwrite: true,
+      })
 
-    await userImage?.move(app.makePath('uploads'), {
-      name: `${cuid()}.${userImage.extname}`,
-    })
-
-    const newPerson = await db.insertQuery().table('users').insert({
-      nombre: name,
-      apellido: lastName,
-      cargo: charge,
-      fotoURL: userImage?.fileName,
-    })
-    return newPerson
+      await user.merge({
+        fotoURL: userImage.fileName,
+      })
+    }
+    return user
   }
 }
