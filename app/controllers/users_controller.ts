@@ -3,8 +3,8 @@
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
-import fs = require('fs')
-import path = require('path')
+import fs from 'node:fs'
+import path from 'node:path'
 
 export default class UsersController {
   async index() {
@@ -46,7 +46,7 @@ export default class UsersController {
 
       await user
         .merge({
-          fotoURL: userImage.fileName,
+          foto_url: userImage.fileName,
         })
         .save()
 
@@ -59,6 +59,16 @@ export default class UsersController {
     if (!user) {
       return response.json({ data: 'Mano ese tipo ya no existe' })
     } else {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const foto_url = user.foto_url
+      if (foto_url) {
+        const imagePath = path.join('uploads', foto_url)
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath)
+        }
+      } else {
+        console.log('No se elimino ninguna imagen')
+      }
       await user.delete()
       return user
     }

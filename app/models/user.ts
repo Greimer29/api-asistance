@@ -23,7 +23,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare cargo: string
 
   @column()
-  declare fotoURL: string
+  declare foto_url: string
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
