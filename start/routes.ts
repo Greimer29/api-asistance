@@ -19,3 +19,4 @@ router.get('/', async () => {
 router.get('apiv1/users', [userController, 'index'])
 router.post('apiv1/users/add', [userController, 'store'])
 router.post('apiv1/users/upload/:id', [userController, 'upload'])
+router.delete('apiv1/users/:id', [userController, 'delete'])

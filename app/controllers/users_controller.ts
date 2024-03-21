@@ -3,6 +3,8 @@
 import User from '#models/user'
 import { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import fs = require('fs')
+import path = require('path')
 
 export default class UsersController {
   async index() {
@@ -21,7 +23,6 @@ export default class UsersController {
         nombre: name,
         apellido: lastName,
         cargo: charge,
-        fotoURL: 'notyet',
       })
       .returning('id')
 
@@ -43,10 +44,23 @@ export default class UsersController {
         overwrite: true,
       })
 
-      await user.merge({
-        fotoURL: userImage.fileName,
-      })
+      await user
+        .merge({
+          fotoURL: userImage.fileName,
+        })
+        .save()
+
+      return user
     }
-    return user
+  }
+
+  async delete({ params, response }: HttpContext) {
+    const user = await User.findOrFail(params.id)
+    if (!user) {
+      return response.json({ data: 'Mano ese tipo ya no existe' })
+    } else {
+      await user.delete()
+      return user
+    }
   }
 }
